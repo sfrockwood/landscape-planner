@@ -201,9 +201,7 @@ canvas { cursor: crosshair; }
     <button class="tbtn" onclick="exportPNG()">Export PNG</button>
     <div id="layout-btns">
       <span>Layout:</span>
-      <button class="lbtn on" data-layout="A" onclick="switchLayout('A')">A</button>
-      <button class="lbtn" data-layout="B" onclick="switchLayout('B')">B</button>
-      <button class="lbtn" data-layout="C" onclick="switchLayout('C')">C</button>
+      <button class="tbtn" id="btn-add-layout" onclick="addLayout()" title="Add new layout">+</button>
     </div>
   </div>
 
@@ -816,6 +814,30 @@ document.querySelectorAll('.pal-item').forEach(item=>{
 function toggleGrid(){ showGrid=!showGrid; document.getElementById('btn-grid').classList.toggle('on',showGrid); draw(); }
 function toggleLabels(){ showLabels=!showLabels; document.getElementById('btn-labels').classList.toggle('on',showLabels); draw(); }
 
+function renderLayoutButtons(){
+  const container=document.getElementById('layout-btns');
+  const addBtn=document.getElementById('btn-add-layout');
+  container.querySelectorAll('.lbtn').forEach(b=>b.remove());
+  Object.keys(layouts).forEach(name=>{
+    const btn=document.createElement('button');
+    btn.className='lbtn'+(name===curLayout?' on':'');
+    btn.dataset.layout=name;
+    btn.textContent=name;
+    btn.onclick=()=>switchLayout(name);
+    container.insertBefore(btn,addBtn);
+  });
+}
+
+function addLayout(){
+  const keys=Object.keys(layouts);
+  if(keys.length>=26) return;
+  const next=String.fromCharCode(65+keys.length);
+  layouts[next]=[];
+  renderLayoutButtons();
+  switchLayout(next);
+  save();
+}
+
 function switchLayout(name){
   curLayout=name;
   sel=null;
@@ -839,7 +861,12 @@ function save(){
 function load(){
   try{
     const s=localStorage.getItem('lp-layouts');
-    if(s){ const p=JSON.parse(s); layouts.A=p.A||[]; layouts.B=p.B||[]; layouts.C=p.C||[]; }
+    if(s){
+      const p=JSON.parse(s);
+      layouts={};
+      ['A','B','C'].forEach(k=>layouts[k]=p[k]||[]);
+      Object.keys(p).filter(k=>!['A','B','C'].includes(k)).sort().forEach(k=>layouts[k]=p[k]||[]);
+    }
   }catch(e){}
 }
 
@@ -912,6 +939,7 @@ const INITIAL_PLAN = [
 // ── Init ───────────────────────────────────────────────────────────────────
 load();
 if(layouts.A.length === 0) layouts.A.push(...INITIAL_PLAN);
+renderLayoutButtons();
 updateStatus(); draw();
 </script>
 </body>
