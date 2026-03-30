@@ -441,43 +441,229 @@ function drawHouse(){
   const [drx,dry]=ty(12,35); ctx.fillText('Driveway',drx,dry);
 }
 
+// ── Element render helpers ────────────────────────────────────────────────
+
+function sSt(isSel,isHov,n){ return isSel?'#60aaff':(isHov?'#fff':n); }
+function rC(el){ const [rx,ry]=ty(el.x,el.y); return [rx,ry,el.w*S,el.h*S]; }
+function clipR(rx,ry,rw,rh){ ctx.save(); ctx.beginPath(); ctx.rect(rx,ry,rw,rh); ctx.clip(); }
+
+function elLabel(el){
+  const d=DEFS[el.type];
+  if(d.shape==='circle'){ const [cx,cy]=ty(el.x,el.y),r=d.r*S; ctx.fillStyle='#fff'; ctx.font='10px system-ui'; ctx.textAlign='center'; ctx.fillText(d.label,cx,cy+r+13); }
+  else { const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='rgba(0,0,0,0.65)'; ctx.font='10px system-ui'; ctx.textAlign='center'; ctx.fillText(`${el.w}×${el.h} yds`,rx+rw/2,ry+rh/2+4); }
+}
+
+function treeOutline(cx,cy,r,bumps,bmp){
+  const st=bumps*10; ctx.beginPath();
+  for(let i=0;i<=st;i++){ const a=(i/st)*Math.PI*2,br=r*(1+Math.sin(a*bumps)*bmp); i===0?ctx.moveTo(cx+Math.cos(a)*br,cy+Math.sin(a)*br):ctx.lineTo(cx+Math.cos(a)*br,cy+Math.sin(a)*br); }
+  ctx.closePath();
+}
+function drawTreeEl(el,bumps,bmp,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S,{fill,stroke}=DEFS[el.type];
+  ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=10;
+  treeOutline(cx,cy,r,bumps,bmp); ctx.fillStyle=fill; ctx.fill();
+  ctx.shadowBlur=0;
+  treeOutline(cx,cy,r*0.58,bumps,bmp*0.6); ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.fill();
+  treeOutline(cx,cy,r,bumps,bmp); ctx.strokeStyle=sSt(isSel,isHov,stroke); ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,Math.max(2,r*0.1),0,Math.PI*2); ctx.fillStyle='rgba(60,30,10,0.65)'; ctx.fill();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawShrubEl(el,lumps,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S,{fill,stroke}=DEFS[el.type];
+  ctx.beginPath();
+  for(let i=0;i<lumps;i++){ const a1=(i/lumps)*Math.PI*2,a2=((i+1)/lumps)*Math.PI*2,mid=(a1+a2)/2; i===0&&ctx.moveTo(cx+Math.cos(a1)*r,cy+Math.sin(a1)*r); ctx.quadraticCurveTo(cx+Math.cos(mid)*r*1.35,cy+Math.sin(mid)*r*1.35,cx+Math.cos(a2)*r,cy+Math.sin(a2)*r); }
+  ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle=sSt(isSel,isHov,stroke); ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawNativeShrubEl(el,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S,{fill,stroke}=DEFS[el.type];
+  const spk=8; ctx.beginPath();
+  for(let i=0;i<=spk*2;i++){ const a=(i/(spk*2))*Math.PI*2,sr=i%2===0?r:r*0.55; i===0?ctx.moveTo(cx+Math.cos(a)*sr,cy+Math.sin(a)*sr):ctx.lineTo(cx+Math.cos(a)*sr,cy+Math.sin(a)*sr); }
+  ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle=sSt(isSel,isHov,stroke); ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawOrnGrassEl(el,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S;
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.45,0,Math.PI*2); ctx.fillStyle='#6a7018'; ctx.fill();
+  const bl=14;
+  for(let i=0;i<bl;i++){ const a=(i/bl)*Math.PI*2,b=a+0.25; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.quadraticCurveTo(cx+Math.cos(b)*r*0.75,cy+Math.sin(b)*r*0.75,cx+Math.cos(a)*r,cy+Math.sin(a)*r); ctx.strokeStyle=`hsl(${68+i*3},58%,${38+i%4*6}%)`; ctx.lineWidth=1.5; ctx.stroke(); }
+  if(isSel||isHov){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=isSel?'#60aaff':'#fff'; ctx.lineWidth=2; ctx.stroke(); }
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawBoulderEl(el,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S;
+  const pts=[[0,-1],[0.62,-0.76],[1,0.08],[0.72,0.82],[-0.08,1],[-0.78,0.66],[-1,-0.08],[-0.58,-0.8]];
+  ctx.beginPath(); pts.forEach(([dx,dy],i)=>{ i===0?ctx.moveTo(cx+dx*r,cy+dy*r):ctx.lineTo(cx+dx*r,cy+dy*r); }); ctx.closePath();
+  const g=ctx.createRadialGradient(cx-r*0.3,cy-r*0.35,r*0.05,cx,cy,r);
+  g.addColorStop(0,'#d0d0d0'); g.addColorStop(0.55,'#969696'); g.addColorStop(1,'#525252');
+  ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle=sSt(isSel,isHov,'#606060'); ctx.lineWidth=isSel?2.5:1; ctx.stroke();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawWaterEl(el,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  const g=ctx.createRadialGradient(cx-r*0.2,cy-r*0.2,0,cx,cy,r); g.addColorStop(0,'#70c0f8'); g.addColorStop(1,'#1a5090');
+  ctx.fillStyle=g; ctx.fill();
+  for(let ri=r*0.28;ri<r;ri+=r*0.28){ ctx.beginPath(); ctx.arc(cx,cy,ri,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=0.8; ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=sSt(isSel,isHov,'#1a5090'); ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawFirepitEl(el,isSel,isHov){
+  const [cx,cy]=ty(el.x,el.y),r=DEFS[el.type].r*S;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle='#727272'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.65,0,Math.PI*2); ctx.fillStyle='#1e1e1e'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.42,0,Math.PI*2); ctx.fillStyle='#c03000'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.22,0,Math.PI*2); ctx.fillStyle='#f0a000'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=sSt(isSel,isHov,'#4a4a4a'); ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawPatioEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#c0b8b0'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.8;
+  for(let x=rx+S;x<rx+rw;x+=S){ ctx.beginPath(); ctx.moveTo(x,ry); ctx.lineTo(x,ry+rh); ctx.stroke(); }
+  for(let y=ry+S;y<ry+rh;y+=S){ ctx.beginPath(); ctx.moveTo(rx,y); ctx.lineTo(rx+rw,y); ctx.stroke(); }
+  ctx.strokeStyle=sSt(isSel,isHov,'#888078'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawPathEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#c4a868'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=0.8;
+  if(rw>=rh){ for(let x=rx+S;x<rx+rw;x+=S){ ctx.beginPath(); ctx.moveTo(x,ry); ctx.lineTo(x,ry+rh); ctx.stroke(); } }
+  else { for(let y=ry+S;y<ry+rh;y+=S){ ctx.beginPath(); ctx.moveTo(rx,y); ctx.lineTo(rx+rw,y); ctx.stroke(); } }
+  ctx.strokeStyle=sSt(isSel,isHov,'#9a7a40'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawFenceEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#a08058'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.fillStyle='#6a4820';
+  if(rw>=rh){ for(let x=rx;x<=rx+rw+1;x+=S) ctx.fillRect(x-1.5,ry,3,rh); }
+  else { for(let y=ry;y<=ry+rh+1;y+=S) ctx.fillRect(rx,y-1.5,rw,3); }
+  ctx.strokeStyle=sSt(isSel,isHov,'#6a5030'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawDryCreekEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#d8c898'; ctx.fillRect(rx,ry,rw,rh);
+  const st=Math.max(3,Math.min(rw,rh)*0.13);
+  clipR(rx,ry,rw,rh);
+  let si=0;
+  for(let row=0;row*st*2.1<rh+st;row++){ for(let col=0;col*st*2.1<rw+st;col++){
+    const ox=(row%2)*st*0.85,sx=rx+col*st*2.1+st+ox,sy=ry+row*st*2.1+st;
+    const vx=1+((si*13)%5-2)*0.14,vy=1+((si*7)%5-2)*0.14;
+    ctx.beginPath(); ctx.ellipse(sx,sy,st*vx,st*vy,si*0.38,0,Math.PI*2);
+    ctx.fillStyle=['#b0a070','#c8b880','#a09060','#d0c088'][si%4]; ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5; ctx.stroke();
+    si++;
+  }}
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#8a7a58'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawGrassEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#4a9a28'; ctx.fillRect(rx,ry,rw,rh);
+  clipR(rx,ry,rw,rh);
+  const sp=S*0.52; ctx.strokeStyle='#2a7010'; ctx.lineWidth=0.8;
+  for(let px=rx+sp/2;px<rx+rw;px+=sp) for(let py=ry+sp/2;py<ry+rh;py+=sp){ ctx.beginPath(); ctx.moveTo(px-2,py+2); ctx.lineTo(px,py-3); ctx.lineTo(px+2,py+2); ctx.stroke(); }
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#2a6a10'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawDecompGraniteEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#c8b890'; ctx.fillRect(rx,ry,rw,rh);
+  clipR(rx,ry,rw,rh);
+  const cols=['#a89060','#e0c8a0','#b8a070','#d0b880','#988050'];
+  for(let px=rx+2;px<rx+rw;px+=4) for(let py=ry+2;py<ry+rh;py+=4){ const v=((px*17+py*31)^(px*7))&0xf; ctx.beginPath(); ctx.arc(px,py,0.8+(v&3)*0.3,0,Math.PI*2); ctx.fillStyle=cols[v%5]; ctx.fill(); }
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#9a8860'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawMulchEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#7a4820'; ctx.fillRect(rx,ry,rw,rh);
+  clipR(rx,ry,rw,rh);
+  ctx.strokeStyle='rgba(0,0,0,0.22)'; ctx.lineWidth=0.7;
+  for(let d=-(rh);d<rw+rh;d+=7){ ctx.beginPath(); ctx.moveTo(rx+d,ry); ctx.lineTo(rx+d+rh,ry+rh); ctx.stroke(); }
+  for(let d=-(rh);d<rw+rh;d+=7){ ctx.beginPath(); ctx.moveTo(rx+d,ry+rh); ctx.lineTo(rx+d+rh,ry); ctx.stroke(); }
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#5a3a18'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawGardenBedEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el); ctx.fillStyle='#7a5020'; ctx.fillRect(rx,ry,rw,rh);
+  clipR(rx,ry,rw,rh);
+  const sp=S*0.75,flrs=['#e04050','#f07820','#dfc030','#9040b0','#30a0d0','#e06080'];
+  let fi=0;
+  for(let px=rx+sp/2;px<rx+rw;px+=sp){ for(let py=ry+sp/2;py<ry+rh;py+=sp){
+    for(let p=0;p<5;p++){ const pa=(p/5)*Math.PI*2; ctx.beginPath(); ctx.ellipse(px+Math.cos(pa)*3,py+Math.sin(pa)*3,2.5,1.5,pa,0,Math.PI*2); ctx.fillStyle=flrs[fi%flrs.length]; ctx.fill(); }
+    ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fillStyle='#f0d040'; ctx.fill();
+    fi++;
+  }}
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#8a6020'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawRaisedBedEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el),fw=5;
+  ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(rx+3,ry+4,rw,rh);
+  ctx.fillStyle='#7a5020'; ctx.fillRect(rx,ry,rw,rh);
+  ctx.fillStyle='#3a2010'; ctx.fillRect(rx+fw,ry+fw,rw-fw*2,rh-fw*2);
+  ctx.strokeStyle='#9a6830'; ctx.lineWidth=fw; ctx.strokeRect(rx+fw/2,ry+fw/2,rw-fw,rh-fw);
+  ctx.strokeStyle=sSt(isSel,isHov,'#7a5020'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
+function drawRainGardenEl(el,isSel,isHov){
+  const [rx,ry,rw,rh]=rC(el),cx=rx+rw/2,cy=ry+rh/2;
+  ctx.fillStyle='#2a5a4a'; ctx.fillRect(rx,ry,rw,rh);
+  clipR(rx,ry,rw,rh);
+  for(let s=0.88;s>0.1;s-=0.22){ ctx.beginPath(); ctx.ellipse(cx,cy,rw/2*s,rh/2*s,0,0,Math.PI*2); ctx.strokeStyle=`rgba(100,215,190,${0.12+s*0.28})`; ctx.lineWidth=1.2; ctx.stroke(); }
+  ctx.beginPath(); ctx.ellipse(cx,cy,rw*0.1,rh*0.1,0,0,Math.PI*2); ctx.fillStyle='rgba(80,160,210,0.75)'; ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle=sSt(isSel,isHov,'#2a5a4a'); ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
+  if(showLabels||isSel) elLabel(el);
+}
+
 function drawElements(){
-  const list = [...els()].sort((a,b)=>(LAYER[a.type]??0)-(LAYER[b.type]??0));
+  const list=[...els()].sort((a,b)=>(LAYER[a.type]??0)-(LAYER[b.type]??0));
   list.forEach(el=>{
-    const d = DEFS[el.type];
-    const isSel = el===sel;
-    const isHov = el===hover;
-
-    ctx.shadowColor='rgba(0,0,0,0.35)'; ctx.shadowBlur=5;
-
-    if(d.shape==='circle'){
-      const [cx,cy]=ty(el.x,el.y);
-      const r=d.r*S;
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-      ctx.fillStyle=d.fill; ctx.fill();
-      ctx.strokeStyle=isSel?'#60aaff':(isHov?'#fff':d.stroke);
-      ctx.lineWidth=isSel?2.5:1.5; ctx.stroke();
-      ctx.shadowBlur=0;
-      // trunk
-      ctx.beginPath(); ctx.arc(cx,cy,Math.max(2,r*0.08),0,Math.PI*2);
-      ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fill();
-      if(showLabels||isSel){
-        ctx.fillStyle='#fff'; ctx.font='10px system-ui';
-        ctx.textAlign='center';
-        ctx.fillText(d.label,cx,cy+r+13);
-      }
-    } else {
-      const [rx,ry]=ty(el.x,el.y);
-      const rw=el.w*S, rh=el.h*S;
-      ctx.fillStyle=d.fill; ctx.fillRect(rx,ry,rw,rh);
-      ctx.strokeStyle=isSel?'#60aaff':(isHov?'#fff':d.stroke);
-      ctx.lineWidth=isSel?2.5:1.5; ctx.strokeRect(rx,ry,rw,rh);
-      ctx.shadowBlur=0;
-      if(showLabels||isSel){
-        ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.font='10px system-ui';
-        ctx.textAlign='center';
-        ctx.fillText(`${el.w}×${el.h} yds`,rx+rw/2,ry+rh/2+4);
-      }
+    const isSel=el===sel,isHov=el===hover;
+    ctx.shadowColor='rgba(0,0,0,0.3)'; ctx.shadowBlur=4;
+    switch(el.type){
+      case 'tree-lg':        drawTreeEl(el,7,0.12,isSel,isHov); break;
+      case 'tree-md':        drawTreeEl(el,6,0.14,isSel,isHov); break;
+      case 'tree-sm':        drawTreeEl(el,5,0.17,isSel,isHov); break;
+      case 'shrub':          drawShrubEl(el,5,isSel,isHov); break;
+      case 'native-shrub':   drawNativeShrubEl(el,isSel,isHov); break;
+      case 'orn-grass':      drawOrnGrassEl(el,isSel,isHov); break;
+      case 'boulder':        drawBoulderEl(el,isSel,isHov); break;
+      case 'water':          drawWaterEl(el,isSel,isHov); break;
+      case 'firepit':        drawFirepitEl(el,isSel,isHov); break;
+      case 'patio':          drawPatioEl(el,isSel,isHov); break;
+      case 'path':           drawPathEl(el,isSel,isHov); break;
+      case 'fence':          drawFenceEl(el,isSel,isHov); break;
+      case 'dry-creek':      drawDryCreekEl(el,isSel,isHov); break;
+      case 'grass':          drawGrassEl(el,isSel,isHov); break;
+      case 'decomp-granite': drawDecompGraniteEl(el,isSel,isHov); break;
+      case 'mulch':          drawMulchEl(el,isSel,isHov); break;
+      case 'garden-bed':     drawGardenBedEl(el,isSel,isHov); break;
+      case 'raised-bed':     drawRaisedBedEl(el,isSel,isHov); break;
+      case 'rain-garden':    drawRainGardenEl(el,isSel,isHov); break;
     }
     ctx.shadowBlur=0;
   });
