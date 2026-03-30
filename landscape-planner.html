@@ -623,8 +623,70 @@ function exportPNG(){
   a.href=canvas.toDataURL(); a.click();
 }
 
+// ── Initial expert plan (populates Layout A on first load) ─────────────────
+const INITIAL_PLAN = [
+  // ── FRONT YARD: foundation planting & street trees (builder does grass) ──
+  {type:'tree-md',        x:3,    y:35},          // Left street tree (Serviceberry/Desert Willow)
+  {type:'tree-md',        x:36,   y:35},          // Right street tree
+  {type:'native-shrub',   x:13,   y:30},          // Foundation — left corner
+  {type:'orn-grass',      x:17,   y:30},          // Foundation — right of garage
+  {type:'native-shrub',   x:21.5, y:30.5},        // Foundation — center
+  {type:'orn-grass',      x:26,   y:30.5},        // Foundation — right of door
+  {type:'native-shrub',   x:29,   y:30},          // Foundation — right corner
+  {type:'garden-bed',     x:25.5, y:29, w:4, h:2},// Garden bed right of front door
+
+  // ── LEFT SIDE YARD: slope x=0–12, y=9–29 ────────────────────────────────
+  {type:'mulch',          x:0,    y:9,  w:12, h:20}, // Full slope mulch coverage
+  {type:'dry-creek',      x:2,    y:9,  w:2,  h:20}, // Drainage channel runs slope
+  {type:'boulder',        x:5.5,  y:12},
+  {type:'boulder',        x:9,    y:14},
+  {type:'boulder',        x:1,    y:16},
+  {type:'boulder',        x:5,    y:22},
+  {type:'boulder',        x:2,    y:27},
+  {type:'native-shrub',   x:9.5,  y:11},
+  {type:'native-shrub',   x:6,    y:17},
+  {type:'native-shrub',   x:10,   y:20},
+  {type:'native-shrub',   x:4,    y:24.5},
+  {type:'native-shrub',   x:8,    y:28},
+  {type:'orn-grass',      x:10.5, y:16},
+  {type:'orn-grass',      x:6,    y:26},
+
+  // ── RIGHT SIDE YARD: slope x=30–40, y=9–29 ──────────────────────────────
+  {type:'mulch',          x:30,   y:9,  w:10, h:20}, // Full slope mulch coverage
+  {type:'dry-creek',      x:35.5, y:9,  w:2,  h:20}, // Drainage channel
+  {type:'path',           x:38.5, y:9,  w:1.5,h:20}, // Access path front-to-back
+  {type:'boulder',        x:31,   y:12},
+  {type:'boulder',        x:37.5, y:15},
+  {type:'boulder',        x:32,   y:21},
+  {type:'boulder',        x:36.5, y:26},
+  {type:'native-shrub',   x:31.5, y:11},
+  {type:'native-shrub',   x:34,   y:16.5},
+  {type:'native-shrub',   x:36,   y:19},
+  {type:'native-shrub',   x:31,   y:23},
+  {type:'orn-grass',      x:33.5, y:12.5},
+  {type:'orn-grass',      x:32.5, y:25},
+
+  // ── BACK YARD: lower level, y=0–9 ───────────────────────────────────────
+  {type:'decomp-granite', x:0,    y:2,  w:12, h:6},  // Left of patio
+  {type:'decomp-granite', x:30,   y:2,  w:10, h:6},  // Right of patio
+  {type:'patio',          x:12,   y:2,  w:18, h:7},  // Main patio off walkout
+  {type:'rain-garden',    x:0,    y:3,  w:4.5,h:4},  // Captures left-slope runoff
+  {type:'firepit',        x:21,   y:4.5},             // Fire pit, center patio
+  {type:'tree-lg',        x:5,    y:6},               // Shade tree back-left (Gambel Oak)
+  {type:'tree-lg',        x:35,   y:6},               // Shade tree back-right
+  {type:'native-shrub',   x:2,    y:1.5},             // Cliff-edge stabilizers
+  {type:'native-shrub',   x:9,    y:1.5},
+  {type:'native-shrub',   x:32,   y:1.5},
+  {type:'native-shrub',   x:38,   y:1.5},
+  {type:'orn-grass',      x:12,   y:2.5},             // Patio edge softening
+  {type:'orn-grass',      x:30,   y:2.5},
+  {type:'orn-grass',      x:21,   y:2},
+];
+
 // ── Init ───────────────────────────────────────────────────────────────────
-load(); updateStatus(); draw();
+load();
+if(layouts.A.length === 0) layouts.A.push(...INITIAL_PLAN);
+updateStatus(); draw();
 </script>
 </body>
 </html>
