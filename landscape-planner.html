@@ -273,6 +273,29 @@ const DEFS = {
   'rain-garden':   {label:'Rain Garden',      fill:'#4a7a6a', stroke:'#2a5a4a', shape:'rect', mw:1, mh:1},
 };
 
+// ── Draw-order layers (lower = drawn first / underneath) ──────────────────
+const LAYER = {
+  'grass':          0,  // ground covers
+  'decomp-granite': 0,
+  'mulch':          0,
+  'patio':          0,
+  'rain-garden':    0,
+  'dry-creek':      1,  // surface features
+  'path':           1,
+  'fence':          1,
+  'garden-bed':     1,
+  'raised-bed':     1,
+  'boulder':        2,  // mid-height objects
+  'water':          2,
+  'firepit':        2,
+  'shrub':          3,  // plants
+  'native-shrub':   3,
+  'orn-grass':      3,
+  'tree-sm':        4,  // trees always on top
+  'tree-md':        5,
+  'tree-lg':        6,
+};
+
 // ── State ──────────────────────────────────────────────────────────────────
 let tool = 'select';
 let showGrid = true, showLabels = false;
@@ -419,7 +442,7 @@ function drawHouse(){
 }
 
 function drawElements(){
-  const list = els();
+  const list = [...els()].sort((a,b)=>(LAYER[a.type]??0)-(LAYER[b.type]??0));
   list.forEach(el=>{
     const d = DEFS[el.type];
     const isSel = el===sel;
