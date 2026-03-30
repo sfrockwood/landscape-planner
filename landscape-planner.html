@@ -69,6 +69,13 @@ body {
   background: #0f0f0f; padding: 24px;
 }
 canvas { cursor: crosshair; }
+#tooltip {
+  position: fixed; pointer-events: none;
+  background: rgba(20,20,20,0.92); color: #eee;
+  font: 12px system-ui; padding: 5px 9px;
+  border-radius: 5px; border: 1px solid #444;
+  white-space: nowrap; display: none; z-index: 100;
+}
 #statusbar {
   background: #1a1a1a; border-top: 1px solid #2e2e2e;
   padding: 4px 14px; font-size: 11px; color: #666;
@@ -200,6 +207,7 @@ canvas { cursor: crosshair; }
     </div>
   </div>
 
+  <div id="tooltip"></div>
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
   </div>
@@ -507,6 +515,15 @@ canvas.addEventListener('mousemove',e=>{
     canvas.style.cursor=hover?'pointer':'default';
     if(hover!==prev) draw();
   }
+  const tip=document.getElementById('tooltip');
+  if(hover){
+    tip.textContent=DEFS[hover.type].label;
+    tip.style.display='block';
+    tip.style.left=(e.clientX+14)+'px';
+    tip.style.top=(e.clientY-28)+'px';
+  } else {
+    tip.style.display='none';
+  }
   if(drawing&&drawStart){
     draw();
     const rx=Math.min(drawStart.x,snap(x));
@@ -564,7 +581,7 @@ canvas.addEventListener('mouseup',e=>{
   }
 });
 
-canvas.addEventListener('mouseleave',()=>{ drawing=false; drawStart=null; dragOff=null; hover=null; draw(); });
+canvas.addEventListener('mouseleave',()=>{ drawing=false; drawStart=null; dragOff=null; hover=null; draw(); document.getElementById('tooltip').style.display='none'; });
 
 canvas.addEventListener('dblclick',e=>{
   const [x,y]=yardXY(e);
