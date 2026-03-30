@@ -945,9 +945,113 @@ const INITIAL_PLAN = [
   {type:'orn-grass',      x:21,   y:2},
 ];
 
+// ── Mountain aesthetic plan (populates Layout B on first load) ─────────────
+const MOUNTAIN_PLAN = [
+  // ── FRONT YARD: conifers as street trees ────────────────────────────────
+  {type:'tree-lg',       x:3,    y:35},           // Pinyon Pine left
+  {type:'tree-lg',       x:36,   y:35},           // Blue Spruce right
+  {type:'native-shrub',  x:13,   y:30},
+  {type:'orn-grass',     x:17,   y:30},
+  {type:'native-shrub',  x:21.5, y:30.5},
+  {type:'orn-grass',     x:26,   y:30.5},
+  {type:'native-shrub',  x:29,   y:30},
+  {type:'garden-bed',    x:25.5, y:29,  w:4, h:2},
+
+  // ── LEFT SLOPE: dense native planting + wider mountain stream ───────────
+  {type:'mulch',         x:0,    y:9,   w:12, h:20},
+  {type:'dry-creek',     x:1.5,  y:9,   w:3,  h:20},  // wider = mountain stream
+  // Boulder clusters
+  {type:'boulder', x:0.5, y:12},  {type:'boulder', x:1,   y:11},
+  {type:'boulder', x:0.5, y:16.5},{type:'boulder', x:1.5, y:17.5},
+  {type:'boulder', x:0.5, y:21},  {type:'boulder', x:1,   y:22},
+  {type:'boulder', x:0.5, y:26},  {type:'boulder', x:1.5, y:25.5},
+  {type:'boulder', x:7,   y:12.5},{type:'boulder', x:8,   y:13},
+  {type:'boulder', x:6.5, y:20},  {type:'boulder', x:7.5, y:20.5},
+  {type:'boulder', x:8,   y:27},  {type:'boulder', x:9,   y:27.5},
+  // Dense alternating rows of native shrubs + ornamental grass
+  {type:'native-shrub', x:5,    y:10},  {type:'orn-grass',    x:7,    y:10},  {type:'native-shrub', x:9.5,  y:10},  {type:'orn-grass',    x:11,   y:10},
+  {type:'orn-grass',    x:5.5,  y:11.5},{type:'native-shrub', x:7.5,  y:11.5},{type:'orn-grass',    x:10,   y:11.5},{type:'native-shrub', x:11.5, y:11.5},
+  {type:'native-shrub', x:5,    y:13},  {type:'orn-grass',    x:8,    y:13},  {type:'native-shrub', x:10.5, y:13},
+  {type:'orn-grass',    x:6,    y:14.5},{type:'native-shrub', x:8.5,  y:14.5},{type:'orn-grass',    x:11,   y:14.5},
+  {type:'native-shrub', x:5.5,  y:16},  {type:'orn-grass',   x:7.5,  y:16},  {type:'native-shrub', x:10,   y:16},  {type:'orn-grass',    x:11.5, y:16},
+  {type:'orn-grass',    x:5,    y:17.5},{type:'native-shrub', x:8,    y:17.5},{type:'orn-grass',    x:10.5, y:17.5},
+  {type:'native-shrub', x:6,    y:19},  {type:'orn-grass',   x:8.5,  y:19},  {type:'native-shrub', x:11,   y:19},
+  {type:'orn-grass',    x:5.5,  y:20.5},{type:'native-shrub', x:7.5,  y:20.5},{type:'orn-grass',    x:10,   y:20.5},
+  {type:'native-shrub', x:5,    y:22},  {type:'orn-grass',   x:8,    y:22},  {type:'native-shrub', x:10.5, y:22},
+  {type:'orn-grass',    x:6,    y:23.5},{type:'native-shrub', x:8.5,  y:23.5},{type:'orn-grass',    x:11,   y:23.5},
+  {type:'native-shrub', x:5.5,  y:25},  {type:'orn-grass',   x:7.5,  y:25},  {type:'native-shrub', x:10,   y:25},
+  {type:'orn-grass',    x:5,    y:26.5},{type:'native-shrub', x:8,    y:26.5},{type:'orn-grass',    x:11,   y:26.5},
+  {type:'native-shrub', x:6,    y:28},  {type:'orn-grass',   x:9,    y:28},
+
+  // ── RIGHT SLOPE: dense native planting, no path ─────────────────────────
+  {type:'mulch',         x:30,   y:9,   w:10, h:20},
+  {type:'dry-creek',     x:34,   y:9,   w:3,  h:20},  // center of slope
+  // Boulder clusters
+  {type:'boulder', x:30.5, y:11},  {type:'boulder', x:31.5, y:11.5},
+  {type:'boulder', x:30.5, y:17},  {type:'boulder', x:31,   y:18},
+  {type:'boulder', x:30.5, y:23},  {type:'boulder', x:31.5, y:23.5},
+  {type:'boulder', x:31,   y:28},  {type:'boulder', x:32,   y:28.5},
+  {type:'boulder', x:38,   y:12.5},{type:'boulder', x:39,   y:12},
+  {type:'boulder', x:38.5, y:18},  {type:'boulder', x:39.5, y:17.5},
+  {type:'boulder', x:38,   y:24},  {type:'boulder', x:39,   y:24.5},
+  // Dense rows — left of creek (x=30–34)
+  {type:'native-shrub', x:31.5, y:10},  {type:'orn-grass',    x:33.5, y:10},
+  {type:'orn-grass',    x:30.5, y:11.5},{type:'native-shrub', x:32.5, y:11.5},
+  {type:'native-shrub', x:31,   y:13.5},{type:'orn-grass',    x:33,   y:13.5},
+  {type:'orn-grass',    x:30.5, y:15},  {type:'native-shrub', x:32.5, y:15},  {type:'orn-grass',    x:33.5, y:15},
+  {type:'native-shrub', x:31.5, y:16.5},{type:'orn-grass',    x:33,   y:16.5},
+  {type:'orn-grass',    x:30.5, y:18.5},{type:'native-shrub', x:32,   y:18.5},
+  {type:'native-shrub', x:31,   y:20},  {type:'orn-grass',    x:33.5, y:20},
+  {type:'orn-grass',    x:30.5, y:21.5},{type:'native-shrub', x:32.5, y:21.5},
+  {type:'native-shrub', x:31.5, y:23.5},{type:'orn-grass',    x:33,   y:23.5},
+  {type:'orn-grass',    x:30.5, y:25},  {type:'native-shrub', x:32,   y:25},
+  {type:'native-shrub', x:31,   y:26.5},{type:'orn-grass',    x:33.5, y:26.5},
+  {type:'orn-grass',    x:30.5, y:28},  {type:'native-shrub', x:32.5, y:28},
+  // Dense rows — right of creek (x=37–40)
+  {type:'native-shrub', x:37,   y:10.5},{type:'orn-grass',    x:39,   y:10.5},
+  {type:'orn-grass',    x:37.5, y:12},  {type:'native-shrub', x:39.5, y:12},
+  {type:'native-shrub', x:37,   y:14},  {type:'orn-grass',    x:39,   y:14},
+  {type:'orn-grass',    x:37.5, y:15.5},{type:'native-shrub', x:38.5, y:15.5},{type:'orn-grass',    x:39.5, y:15.5},
+  {type:'native-shrub', x:37,   y:17},  {type:'orn-grass',    x:39,   y:17},
+  {type:'orn-grass',    x:37.5, y:19},  {type:'native-shrub', x:39,   y:19},
+  {type:'native-shrub', x:37,   y:20.5},{type:'orn-grass',    x:39.5, y:20.5},
+  {type:'orn-grass',    x:37.5, y:22},  {type:'native-shrub', x:38.5, y:22},
+  {type:'native-shrub', x:37,   y:24},  {type:'orn-grass',    x:39,   y:24},
+  {type:'orn-grass',    x:37.5, y:25.5},{type:'native-shrub', x:39,   y:25.5},
+  {type:'native-shrub', x:37,   y:27},  {type:'orn-grass',    x:39.5, y:27},
+
+  // ── BACK YARD: mountain living space ────────────────────────────────────
+  {type:'decomp-granite',x:0,    y:1.5, w:12, h:7.5},   // Left under aspens
+  {type:'decomp-granite',x:37,   y:1.5, w:3,  h:7.5},   // Right of grass strip
+  {type:'patio',         x:12,   y:2,   w:18, h:7},
+  // L-shaped grass: right of patio + front wrap
+  {type:'grass',         x:30,   y:1.5, w:7,  h:7.5},   // Right of patio
+  {type:'grass',         x:12,   y:0.5, w:18, h:1.5},   // Front wrap strip
+  {type:'rain-garden',   x:0.5,  y:2,   w:4,  h:4.5},
+  {type:'firepit',       x:16,   y:5},
+  // Aspen grove — 5 trees clustered back-left (colony growth)
+  {type:'tree-md',       x:2.5,  y:4.8},
+  {type:'tree-md',       x:4,    y:5},
+  {type:'tree-md',       x:3,    y:6.5},
+  {type:'tree-md',       x:5,    y:4.2},
+  {type:'tree-md',       x:5.5,  y:6},
+  // Large conifers back-right
+  {type:'tree-lg',       x:36,   y:6},
+  {type:'tree-lg',       x:39,   y:4},
+  // Cliff-edge native shrubs
+  {type:'native-shrub',  x:9,    y:1.5},
+  {type:'native-shrub',  x:27,   y:1.5},
+  {type:'native-shrub',  x:34,   y:1.5},
+  // Ornamental grasses softening patio/grass edge
+  {type:'orn-grass',     x:30,   y:2.5},
+  {type:'orn-grass',     x:30,   y:6.5},
+  {type:'orn-grass',     x:37,   y:4.5},
+];
+
 // ── Init ───────────────────────────────────────────────────────────────────
 load();
 if(layouts.A.length === 0) layouts.A.push(...INITIAL_PLAN);
+if(layouts.B.length === 0) layouts.B.push(...MOUNTAIN_PLAN);
 renderLayoutButtons();
 updateStatus(); draw();
 </script>
