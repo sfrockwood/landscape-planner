@@ -134,6 +134,38 @@ canvas { cursor: crosshair; }
   </div>
 
   <div class="pal-section">
+    <h3>Water-Wise (Utah)</h3>
+    <div class="pal-item" data-tool="native-shrub">
+      <div class="pal-icon" style="background:#3a3a10">🌾</div>
+      <div><div class="pal-name">Native Shrub</div><div class="pal-sub">Rabbitbrush, Sage...</div></div>
+    </div>
+    <div class="pal-item" data-tool="orn-grass">
+      <div class="pal-icon" style="background:#2a3a10">🎋</div>
+      <div><div class="pal-name">Ornamental Grass</div><div class="pal-sub">~1.5 yd spread</div></div>
+    </div>
+    <div class="pal-item" data-tool="boulder">
+      <div class="pal-icon" style="background:#3a3a3a">🪨</div>
+      <div><div class="pal-name">Boulder</div><div class="pal-sub">~1–2 yd diameter</div></div>
+    </div>
+    <div class="pal-item" data-tool="dry-creek">
+      <div class="pal-icon" style="background:#3a2a1a">〰</div>
+      <div><div class="pal-name">Dry Creek Bed</div><div class="pal-sub">Click + drag</div></div>
+    </div>
+    <div class="pal-item" data-tool="decomp-granite">
+      <div class="pal-icon" style="background:#4a3a28">▪</div>
+      <div><div class="pal-name">Decomp. Granite</div><div class="pal-sub">Click + drag</div></div>
+    </div>
+    <div class="pal-item" data-tool="mulch">
+      <div class="pal-icon" style="background:#3a2010">🍂</div>
+      <div><div class="pal-name">Mulch Bed</div><div class="pal-sub">Click + drag</div></div>
+    </div>
+    <div class="pal-item" data-tool="rain-garden">
+      <div class="pal-icon" style="background:#0a2a3a">🌧</div>
+      <div><div class="pal-name">Rain Garden</div><div class="pal-sub">Click + drag</div></div>
+    </div>
+  </div>
+
+  <div class="pal-section">
     <h3>Features</h3>
     <div class="pal-item" data-tool="water">
       <div class="pal-icon" style="background:#0a1a3a">💧</div>
@@ -225,9 +257,16 @@ const DEFS = {
   'grass':      {label:'Grass',        fill:'#4a9a28', stroke:'#2a6a10', shape:'rect', mw:1, mh:1},
   'garden-bed': {label:'Garden Bed',   fill:'#c89040', stroke:'#8a6020', shape:'rect', mw:1, mh:1},
   'raised-bed': {label:'Raised Bed',   fill:'#b07840', stroke:'#7a5020', shape:'rect', mw:1, mh:1},
-  'patio':      {label:'Patio',        fill:'#c0b8b0', stroke:'#888078', shape:'rect', mw:1, mh:1},
-  'path':       {label:'Path',         fill:'#c4a868', stroke:'#9a7a40', shape:'rect', mw:1, mh:0.5},
-  'fence':      {label:'Fence',        fill:'#9a7850', stroke:'#6a5030', shape:'rect', mw:2, mh:0.3},
+  'patio':         {label:'Patio',            fill:'#c0b8b0', stroke:'#888078', shape:'rect', mw:1, mh:1},
+  'path':          {label:'Path',             fill:'#c4a868', stroke:'#9a7a40', shape:'rect', mw:1, mh:0.5},
+  'fence':         {label:'Fence',            fill:'#9a7850', stroke:'#6a5030', shape:'rect', mw:2, mh:0.3},
+  'native-shrub':  {label:'Native Shrub',     r:0.75, fill:'#9aaa30', stroke:'#6a7a10', shape:'circle'},
+  'orn-grass':     {label:'Ornamental Grass', r:0.75, fill:'#b8c050', stroke:'#788010', shape:'circle'},
+  'boulder':       {label:'Boulder',          r:0.75, fill:'#909090', stroke:'#606060', shape:'circle'},
+  'dry-creek':     {label:'Dry Creek Bed',    fill:'#b8a888', stroke:'#8a7a58', shape:'rect', mw:1, mh:0.5},
+  'decomp-granite':{label:'Decomp. Granite',  fill:'#c8b890', stroke:'#9a8860', shape:'rect', mw:1, mh:1},
+  'mulch':         {label:'Mulch Bed',        fill:'#8a5a30', stroke:'#5a3a18', shape:'rect', mw:1, mh:1},
+  'rain-garden':   {label:'Rain Garden',      fill:'#4a7a6a', stroke:'#2a5a4a', shape:'rect', mw:1, mh:1},
 };
 
 // ── State ──────────────────────────────────────────────────────────────────
