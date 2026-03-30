@@ -214,6 +214,7 @@ canvas { cursor: crosshair; }
     <span id="s-pos">Pos: —</span>
     <span id="s-tool">Tool: Select</span>
     <span id="s-count">Elements: 0</span>
+    <span id="s-saved"></span>
     <span style="margin-left:auto">Double-click element to delete &nbsp;|&nbsp; Drag to move (Select tool)</span>
   </div>
 </div>
@@ -854,9 +855,17 @@ function updateStatus(){
   document.getElementById('s-count').textContent=`Elements: ${els().length}`;
 }
 
+let _saveFlashTimer=null;
 function save(){
-  try{ localStorage.setItem('lp-layouts',JSON.stringify(layouts)); }catch(e){}
+  try{
+    localStorage.setItem('lp-layouts',JSON.stringify(layouts));
+    const el=document.getElementById('s-saved');
+    el.textContent='Saved ✓'; el.style.color='#6a6';
+    clearTimeout(_saveFlashTimer);
+    _saveFlashTimer=setTimeout(()=>{ el.textContent=''; },1800);
+  }catch(e){}
 }
+setInterval(save, 30000);
 
 function load(){
   try{
